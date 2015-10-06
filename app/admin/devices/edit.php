@@ -202,9 +202,9 @@ $(document).ready(function(){
 			}
 			//boolean
 			elseif($myField['type'] == "tinyint(1)") {
-
 				print '<input type="checkbox" name="'.$myField['name'].'" value="1"';
-				if($device[$myField['name']]) print 'checked="checked"';
+				if($_POST['action'] == 'add' && $myField['Default']) print 'checked="checked"';
+				if($_POST['action'] == 'edit' && $device[$myField['name']]) print 'checked="checked"';
 				print '>';
 
 			}
