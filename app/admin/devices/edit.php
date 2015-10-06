@@ -184,17 +184,11 @@ $(document).ready(function(){
 			}
 			//boolean
 			elseif($myField['type'] == "tinyint(1)") {
-				print "<select name='$myField[nameNew]' class='form-control input-sm input-w-auto' rel='tooltip' data-placement='right' title='$myField[Comment]'>";
-				$tmp = array(0=>"No",1=>"Yes");
-				//null
-				if($myField['Null']!="NO") { $tmp[2] = ""; }
 
-				foreach($tmp as $k=>$v) {
-					if(strlen($device[$myField['name']])==0 && $k==2)	{ print "<option value='$k' selected='selected'>"._($v)."</option>"; }
-					elseif($k==$device[$myField['name']])				{ print "<option value='$k' selected='selected'>"._($v)."</option>"; }
-					else												{ print "<option value='$k'>"._($v)."</option>"; }
-				}
-				print "</select>";
+				print '<input type="checkbox" name="'.$myField['name'].'" value="1"';
+				if($device[$myField['name']]) print 'checked="checked"';
+				print '>';
+
 			}
 			//text
 			elseif($myField['type'] == "text") {
@@ -229,18 +223,25 @@ $(document).ready(function(){
 		# select sections
 		$Sections = new Sections ($Database);
 		$sections = $Sections->fetch_all_sections();
-
-		# reformat device sections to array
-		$deviceSections = explode(";", $device['sections']);
-		$deviceSections = is_array($deviceSections) ? $deviceSections : array();
-
-		if ($sections!==false) {
-			foreach($sections as $section) {
-				if(in_array($section->id, $deviceSections)) 	{ print '<div class="checkbox" style="margin:0px;"><input type="checkbox" name="section-'. $section->id .'" value="on" checked> '. $section->name .'</div>'. "\n"; }
-				else 											{ print '<div class="checkbox" style="margin:0px;"><input type="checkbox" name="section-'. $section->id .'" value="on">'. $section->name .'</span></div>'. "\n"; }
+		
+		?>
+		<select name="sections" class="form-control input-sm input-w-auto">
+		<?php
+		foreach ($sections as $key=>$val) {
+			if($val->masterSection == 0){ 
+				print "<optgroup label='$val->name'>";
+				foreach ($sections as $k2=>$v2) { 
+					if ($v2->masterSection == $val->id)
+					print "<option value='$v2->id' ";
+					if($device['sections'] == $v2->id) echo 'selected="selected"';
+					print ">".$v2->name."</option>";
+				} 
+				print "</optgroup>";
 			}
 		}
+		
 		?>
+		</select>
 		</td>
 	</tr>
 

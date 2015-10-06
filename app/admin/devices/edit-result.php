@@ -34,8 +34,6 @@ foreach($device as $key=>$line) {
 		unset($device[$key]);
 	}
 }
-# glue sections together
-$device['sections'] = sizeof($temp)>0 ? implode(";", $temp) : null;
 
 # Hostname must be present
 if($device['hostname'] == "") 											{ $Result->show("danger", _('Hostname is mandatory').'!', true); }
@@ -55,9 +53,9 @@ if(sizeof($custom) > 0) {
 		if($myField['Null']=="NO" && strlen($device[$myField['name']])==0) {
 																		{ $Result->show("danger", $myField['name'].'" can not be empty!', true); }
 		}
+		# save to update array
+		$update[$myField['name']] = $device[$myField['name']];
 	}
-	# save to update array
-	$update[$myField['name']] = $device[$myField['name']];
 }
 
 # set update values
