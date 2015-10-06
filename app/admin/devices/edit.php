@@ -73,19 +73,11 @@ $(document).ready(function(){
 			<?php
 			$types = $Admin->fetch_all_objects("deviceTypes", "tid");
 			foreach($types as $key=>$name) {
-				if($device['type'] == $key)	{ print "<option value='$key' selected='selected'>$name->tname</option>"; }
-				else						{ print "<option value='$key' >$name->tname</option>"; }
+				if($device['type'] == $name->tid)	{ print "<option value='$name->tid' selected='selected'>$name->tname</option>"; }
+				else						{ print "<option value='$name->tid' >$name->tname</option>"; }
 			}
 			?>
 			</select>
-		</td>
-	</tr>
-
-	<!-- Vendor -->
-	<tr>
-		<td><?php print _('Vendor'); ?></td>
-		<td>
-			<input type="text" name="vendor" class="form-control input-sm" placeholder="<?php print _('Vendor'); ?>" value="<?php if(isset($device['vendor'])) print $device['vendor']; ?>" <?php print $readonly; ?>>
 		</td>
 	</tr>
 
@@ -94,14 +86,6 @@ $(document).ready(function(){
 		<td><?php print _('Model'); ?></td>
 		<td>
 			<input type="text" name="model" class="form-control input-sm" placeholder="<?php print _('Model'); ?>" value="<?php if(isset($device['model'])) print $device['model']; ?>" <?php print $readonly; ?>>
-		</td>
-	</tr>
-
-	<!-- Version -->
-	<tr>
-		<td><?php print _('SW version'); ?></td>
-		<td>
-			<input type="text" name="version" class="form-control input-sm" placeholder="<?php print _('Software version'); ?>" value="<?php if(isset($device['version'])) print $device['version']; ?>" <?php print $readonly; ?>>
 		</td>
 	</tr>
 
@@ -117,7 +101,41 @@ $(document).ready(function(){
 			<input type="hidden" name="action" value="<?php print $_POST['action']; ?>">
 		</td>
 	</tr>
+	<!-- Sections -->
+	<tr>
+		<td colspan="2">
+			<hr>
+		</td>
+	</tr>
 
+	<tr>
+		<td><?php print _('Section'); ?>:</td>
+		<td>
+		<?php
+		# select sections
+		$Sections = new Sections ($Database);
+		$sections = $Sections->fetch_all_sections();
+		
+		?>
+		<select name="sections" class="form-control input-sm input-w-auto">
+		<?php
+		foreach ($sections as $key=>$val) {
+			if($val->masterSection == 0){ 
+				print "<optgroup label='$val->name'>";
+				foreach ($sections as $k2=>$v2) { 
+					if ($v2->masterSection == $val->id)
+					print "<option value='$v2->id' ";
+					if($device['sections'] == $v2->id) echo 'selected="selected"';
+					print ">".$v2->name."</option>";
+				} 
+				print "</optgroup>";
+			}
+		}
+		
+		?>
+		</select>
+		</td>
+	</tr>
 	<!-- Custom -->
 	<?php
 	if(sizeof($custom) > 0) {
@@ -139,7 +157,7 @@ $(document).ready(function(){
 			else						{ $required = ""; }
 
 			print '<tr>'. "\n";
-			print '	<td>'. $myField['name'] .' '.$required.'</td>'. "\n";
+			print '	<td>'. ucwords(str_replace('_', ' ', $myField['name'])) .' '.$required.'</td>'. "\n";
 			print '	<td>'. "\n";
 
 			//set type
@@ -184,17 +202,11 @@ $(document).ready(function(){
 			}
 			//boolean
 			elseif($myField['type'] == "tinyint(1)") {
-				print "<select name='$myField[nameNew]' class='form-control input-sm input-w-auto' rel='tooltip' data-placement='right' title='$myField[Comment]'>";
-				$tmp = array(0=>"No",1=>"Yes");
-				//null
-				if($myField['Null']!="NO") { $tmp[2] = ""; }
 
-				foreach($tmp as $k=>$v) {
-					if(strlen($device[$myField['name']])==0 && $k==2)	{ print "<option value='$k' selected='selected'>"._($v)."</option>"; }
-					elseif($k==$device[$myField['name']])				{ print "<option value='$k' selected='selected'>"._($v)."</option>"; }
-					else												{ print "<option value='$k'>"._($v)."</option>"; }
-				}
-				print "</select>";
+				print '<input type="checkbox" name="'.$myField['name'].'" value="1"';
+				if($device[$myField['name']]) print 'checked="checked"';
+				print '>';
+
 			}
 			//text
 			elseif($myField['type'] == "text") {
@@ -213,36 +225,7 @@ $(document).ready(function(){
 
 	?>
 
-	<!-- Sections -->
-	<tr>
-		<td colspan="2">
-			<hr>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2"><?php print _('Sections to display device in'); ?>:</td>
-	</tr>
-	<tr>
-		<td></td>
-		<td>
-		<?php
-		# select sections
-		$Sections = new Sections ($Database);
-		$sections = $Sections->fetch_all_sections();
-
-		# reformat device sections to array
-		$deviceSections = explode(";", $device['sections']);
-		$deviceSections = is_array($deviceSections) ? $deviceSections : array();
-
-		if ($sections!==false) {
-			foreach($sections as $section) {
-				if(in_array($section->id, $deviceSections)) 	{ print '<div class="checkbox" style="margin:0px;"><input type="checkbox" name="section-'. $section->id .'" value="on" checked> '. $section->name .'</div>'. "\n"; }
-				else 											{ print '<div class="checkbox" style="margin:0px;"><input type="checkbox" name="section-'. $section->id .'" value="on">'. $section->name .'</span></div>'. "\n"; }
-			}
-		}
-		?>
-		</td>
-	</tr>
+	
 
 	</table>
 	</form>

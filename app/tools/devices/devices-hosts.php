@@ -68,7 +68,7 @@ if($_GET['sPage']!=0 && sizeof($device)>0) {
 		$section_ids = explode(";", $device['sections']);
 		foreach($section_ids as $k=>$id) {
 			$section = $Sections->fetch_section(null, $id);
-			$section_print[$k]  = "&middot; ".$section->name;
+			$section_print[$k]  = $section->name;
 			$section_print[$k] .= strlen($section->description)>0 ? " <span class='text-muted'>($section->description)</span>" : "";
 		}
 		print implode("<br>", $section_print);
@@ -94,7 +94,7 @@ if($_GET['sPage']!=0 && sizeof($device)>0) {
 			$device[$field['name']] = $Result->create_links ($device[$field['name']]);
 
 			print "<tr>";
-			print "<th>$field[name]</th>";
+			print "<th>".ucfirst(str_replace('_', ' ',$field[name]))."</th>";
 			print "<td>".$device[$field['name']]."</d>";
 			print "</tr>";
 		}
