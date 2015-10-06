@@ -81,27 +81,11 @@ $(document).ready(function(){
 		</td>
 	</tr>
 
-	<!-- Vendor -->
-	<tr>
-		<td><?php print _('Vendor'); ?></td>
-		<td>
-			<input type="text" name="vendor" class="form-control input-sm" placeholder="<?php print _('Vendor'); ?>" value="<?php if(isset($device['vendor'])) print $device['vendor']; ?>" <?php print $readonly; ?>>
-		</td>
-	</tr>
-
 	<!-- Model -->
 	<tr>
 		<td><?php print _('Model'); ?></td>
 		<td>
 			<input type="text" name="model" class="form-control input-sm" placeholder="<?php print _('Model'); ?>" value="<?php if(isset($device['model'])) print $device['model']; ?>" <?php print $readonly; ?>>
-		</td>
-	</tr>
-
-	<!-- Version -->
-	<tr>
-		<td><?php print _('SW version'); ?></td>
-		<td>
-			<input type="text" name="version" class="form-control input-sm" placeholder="<?php print _('Software version'); ?>" value="<?php if(isset($device['version'])) print $device['version']; ?>" <?php print $readonly; ?>>
 		</td>
 	</tr>
 
@@ -117,7 +101,41 @@ $(document).ready(function(){
 			<input type="hidden" name="action" value="<?php print $_POST['action']; ?>">
 		</td>
 	</tr>
+	<!-- Sections -->
+	<tr>
+		<td colspan="2">
+			<hr>
+		</td>
+	</tr>
 
+	<tr>
+		<td><?php print _('Section'); ?>:</td>
+		<td>
+		<?php
+		# select sections
+		$Sections = new Sections ($Database);
+		$sections = $Sections->fetch_all_sections();
+		
+		?>
+		<select name="sections" class="form-control input-sm input-w-auto">
+		<?php
+		foreach ($sections as $key=>$val) {
+			if($val->masterSection == 0){ 
+				print "<optgroup label='$val->name'>";
+				foreach ($sections as $k2=>$v2) { 
+					if ($v2->masterSection == $val->id)
+					print "<option value='$v2->id' ";
+					if($device['sections'] == $v2->id) echo 'selected="selected"';
+					print ">".$v2->name."</option>";
+				} 
+				print "</optgroup>";
+			}
+		}
+		
+		?>
+		</select>
+		</td>
+	</tr>
 	<!-- Custom -->
 	<?php
 	if(sizeof($custom) > 0) {
@@ -139,7 +157,7 @@ $(document).ready(function(){
 			else						{ $required = ""; }
 
 			print '<tr>'. "\n";
-			print '	<td>'. $myField['name'] .' '.$required.'</td>'. "\n";
+			print '	<td>'. ucwords(str_replace('_', ' ', $myField['name'])) .' '.$required.'</td>'. "\n";
 			print '	<td>'. "\n";
 
 			//set type
@@ -207,43 +225,7 @@ $(document).ready(function(){
 
 	?>
 
-	<!-- Sections -->
-	<tr>
-		<td colspan="2">
-			<hr>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2"><?php print _('Sections to display device in'); ?>:</td>
-	</tr>
-	<tr>
-		<td></td>
-		<td>
-		<?php
-		# select sections
-		$Sections = new Sections ($Database);
-		$sections = $Sections->fetch_all_sections();
-		
-		?>
-		<select name="sections" class="form-control input-sm input-w-auto">
-		<?php
-		foreach ($sections as $key=>$val) {
-			if($val->masterSection == 0){ 
-				print "<optgroup label='$val->name'>";
-				foreach ($sections as $k2=>$v2) { 
-					if ($v2->masterSection == $val->id)
-					print "<option value='$v2->id' ";
-					if($device['sections'] == $v2->id) echo 'selected="selected"';
-					print ">".$v2->name."</option>";
-				} 
-				print "</optgroup>";
-			}
-		}
-		
-		?>
-		</select>
-		</td>
-	</tr>
+	
 
 	</table>
 	</form>
