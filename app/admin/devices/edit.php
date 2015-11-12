@@ -80,7 +80,26 @@ $(document).ready(function(){
 			</select>
 		</td>
 	</tr>
+	<!-- Type -->
+	<tr>
+		<td><?php print _('Parent Device');?></td>
 
+		<td>
+			<select name="parent_device" class="form-control input-sm input-w-auto">
+
+			<?php
+			if($device['parent_device'] == 0) 	{ print "<option value='0' selected='selected'>None</option>"; }
+			else 								{ print "<option value='0' >None</option>"; }
+
+			$parent_devices = $Admin->fetch_multiple_objects("devices", "sections", ($device['sections']) ? $device['sections'] : $_POST['section']); 
+			foreach($parent_devices as $key=>$name) {
+				if($device['parent_device'] == $name->id)	{ print "<option value='$name->id' selected='selected'>$name->hostname</option>"; }
+				else						{ print "<option value='$name->id' >$name->hostname</option>"; }
+			}
+			?>
+			</select>
+		</td>
+	</tr>
 	<!-- Model -->
 	<tr>
 		<td><?php print _('Model'); ?></td>
@@ -115,7 +134,6 @@ $(document).ready(function(){
 		# select sections
 		$Sections = new Sections ($Database);
 		$sections = $Sections->fetch_all_sections();
-		
 		?>
 		<select name="sections" class="form-control input-sm input-w-auto">
 		<?php
@@ -125,7 +143,11 @@ $(document).ready(function(){
 				foreach ($sections as $k2=>$v2) { 
 					if ($v2->masterSection == $val->id)
 					print "<option value='$v2->id' ";
-					if($device['sections'] == $v2->id) echo 'selected="selected"';
+					if($device['sections'] == $v2->id) {
+						echo 'selected="selected"';
+					}elseif($_POST['section'] == $v2->id) {
+						echo 'selected="selected"';
+					}
 					print ">".$v2->name."</option>";
 				} 
 				print "</optgroup>";
@@ -139,6 +161,9 @@ $(document).ready(function(){
 	<!-- Custom -->
 	<?php
 	if(sizeof($custom) > 0) {
+		//remove parent_device custom field
+		if(is_array($custom['parent_device']))
+		    unset($custom['parent_device']);
 
 		print '<tr>';
 		print '	<td colspan="2"><hr></td>';
@@ -149,6 +174,8 @@ $(document).ready(function(){
 
 		# all my fields
 		foreach($custom as $myField) {
+			
+
 			# replace spaces with |
 			$myField['nameNew'] = str_replace(" ", "___", $myField['name']);
 

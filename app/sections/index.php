@@ -74,7 +74,7 @@ require( dirname(__FILE__) . '/../admin/admin-menu-config.php' );
 
 	<!-- menu -->
 	<div class="collapse navbar-collapse" id="menu-collapse">
-
+	<h2><?=$section->name?></h2>
 	<!-- sections -->
 	<ul class="nav navbar-nav sections">
 		<?php

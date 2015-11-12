@@ -41,21 +41,14 @@ else {
 	print '	<th>'._('Hostname').'</th>';
 	print '	<th>'._('IP address').'</th>';
 	print '	<th>'._('Type').'</th>';
-	print '	<th>'._('Vendor').'</th>';
 	print '	<th>'._('Model').'</th>';
-	print '	<th>'._('Description').'</th>';
 	print '	<th><i class="icon-gray icon-info-sign" rel="tooltip" title="'._('Shows in which sections device will be visible for selection').'"></i> '._('Sections').'</th>';
-	if(sizeof($custom) > 0) {
-		foreach($custom as $field) {
-			if(!in_array($field['name'], $hidden_custom_fields)) {
-				print "<th class='hidden-xs hidden-sm hidden-md'>".ucfirst(str_replace("_", " ", $field[name]))."</th>";
-			}
-		}
-	}
 	print '	<th class="actions"></th>';
 	print '</tr>';
 
 	# loop through devices
+	$types = $Admin->fetch_all_objects("deviceTypes", "tid");
+
 	foreach ($devices as $device) {
 		//cast
 		$device = (array) $device;
@@ -65,10 +58,14 @@ else {
 
 		print '	<td><a href="'.create_link("tools","devices","hosts",$device['id']).'">'. $device['hostname'] .'</a></td>'. "\n";
 		print '	<td>'. $device['ip_addr'] .'</td>'. "\n";
-		print '	<td>'. $device['description'] .'</td>'. "\n";
-		print '	<td>'. $device['vendor'] .'</td>'. "\n";
+		print '	<td>';
+		foreach ($types as $type) { 
+			if ($type->tid == $device['type']) { 
+				print($type->tname);
+			}
+		}
+		print '</td>'. "\n";
 		print '	<td>'. $device['model'] .'</td>'. "\n";
-		print '	<td class="description">'. $device['description'] .'</td>'. "\n";
 
 		//sections
 		print '	<td class="sections">';
@@ -83,34 +80,6 @@ else {
 			}
 
 		print '	</td>'. "\n";
-
-		//custom
-		if(sizeof($custom) > 0) {
-			foreach($custom as $field) {
-				if(!in_array($field['name'], $hidden_custom_fields)) {
-					print "<td class='hidden-xs hidden-sm hidden-md'>";
-
-					// create links
-					$device[$field['name']] = $Result->create_links ($device[$field['name']]);
-
-					//booleans
-					if($field['type']=="tinyint(1)")	{
-						if($device[$field['name']] == "0")		{ print _("No"); }
-						elseif($device[$field['name']] == "1")	{ print _("Yes"); }
-					}
-					//text
-					elseif($field['type']=="text") {
-						if(strlen($device[$field['name']])>0)	{ print "<i class='fa fa-gray fa-comment' rel='tooltip' data-container='body' data-html='true' title='".str_replace("\n", "<br>", $device[$field['name']])."'>"; }
-						else											{ print ""; }
-					}
-					else {
-						print $device[$field['name']];
-
-					}
-					print "</td>";
-				}
-			}
-		}
 
 		print '	<td class="actions">'. "\n";
 		print "	<div class='btn-group'>";

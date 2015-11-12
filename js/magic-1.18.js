@@ -1825,7 +1825,7 @@ $(document).on("click", ".editFolderSubmitDelete", function() {
 /* ---- Devices ----- */
 //load edit form
 $(document).on("click", ".editSwitch", function() {
-	open_popup("400", "app/admin/devices/edit.php", {switchId:$(this).attr('data-switchid'), action:$(this).attr('data-action')} );
+	open_popup("400", "app/admin/devices/edit.php", {switchId:$(this).attr('data-switchid'), action:$(this).attr('data-action'), section:$(this).attr('data-section')} );
 });
 //submit form
 $(document).on("click", "#editSwitchsubmit", function() {

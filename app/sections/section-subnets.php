@@ -17,7 +17,9 @@ $hidden_fields = is_array($hidden_fields['subnets']) ? $hidden_fields['subnets']
 
 # set colspan
 $colspan = 8 + sizeof($custom);
-if($User->settings->enableVRF == 1) { $colspan++; }
+# Section heading 
+print("<h3 style='margin-top:0px;'>".$section['name']."</h3>");
+print("<hr>");
 
 # title
 print "<h4>"._('Available subnets')."</h4>";
@@ -155,6 +157,73 @@ if($permission != 0) {
 
 	# end master table
 	print "</table>";
+
+	# Print devices in this section
+
+	print "<h4>"._('Devices')."</h4>";
+
+	# print  table structure
+	print "<table id='manageDevices' class='table table-striped table-condensed table-top table-absolute'>";
+	$Admin = new Admin ($Database);
+	# fetch all Devices
+	$devices = $Admin->fetch_multiple_objects("devices", "sections", $_GET['section']);
+
+	# collapsed div with details
+	print "<tbody>";
+
+	# headers
+	print "<tr>";
+	print '	<th>'._('Hostname').'</th>';
+	print '	<th>'._('IP address').'</th>';
+	print '	<th>'._('Type').'</th>';
+	print '	<th>'._('Model').'</th>';
+	print '	<th class="actions"></th>';
+	print "</tr>";
+	
+	?>	
+	<button class='btn btn-sm btn-default editSwitch' data-action='add'   data-switchid='' data-section="<?=$_GET['section']?>" style='margin-bottom:10px;'><i class='fa fa-plus'></i> <?php print _('Add device'); ?></button>
+	<?php
+
+	if(!$devices) {
+		print "<tr><td colspan='$colCount'><div class='alert alert-info'>"._('Section has no devices')."!</div></td></tr>";
+
+	}
+	else {
+		$types = $Admin->fetch_all_objects("deviceTypes", "tid");
+
+		foreach ($devices as $device) {
+		//cast
+		$device = (array) $device;
+
+		//print details
+		print '<tr>'. "\n";
+
+		print '	<td><a href="'.create_link("tools","devices","hosts",$device['id']).'">'. $device['hostname'] .'</a></td>'. "\n";
+		print '	<td>'. $device['ip_addr'] .'</td>'. "\n";
+		print '	<td>';
+		foreach ($types as $type) { 
+			if ($type->tid == $device['type']) { 
+				print($type->tname);
+			}
+		}
+		print '</td>'. "\n";
+		print '	<td>'. $device['model'] .'</td>'. "\n";
+		print '	<td class="actions">'. "\n";
+		print "	<div class='btn-group'>";
+		print "		<button class='btn btn-xs btn-default editSwitch' data-action='edit'   data-switchid='$device[id]'><i class='fa fa-pencil'></i></button>";
+		print "		<button class='btn btn-xs btn-default editSwitch' data-action='delete' data-switchid='$device[id]'><i class='fa fa-times'></i></button>";
+		print "	</div>";
+		print '	</td>'. "\n";
+
+		print '</tr>'. "\n";
+
+	}
+	}
+
+
+
+
+
 }
 else {
 	print "<div class='alert alert-danger'>"._("You do not have permission to access this network")."!</div>";
